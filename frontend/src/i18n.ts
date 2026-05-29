@@ -1,0 +1,62 @@
+import type { Lang } from "./types";
+
+export const UI = {
+  it: {
+    appTitle: "Questionario PRAXIS",
+    subtitle: "AI in Education - follow-up",
+    chooseQuestionnaire: "Scegli il questionario",
+    students: "Studenti",
+    teachers: "Insegnanti",
+    dashboard: "Dashboard live",
+    start: "Inizia",
+    next: "Avanti",
+    prev: "Indietro",
+    submit: "Invia",
+    submitted: "Grazie! Risposta registrata.",
+    required: "Campo obbligatorio",
+    yes: "Si'",
+    no: "No",
+    of: "di",
+    question: "Domanda",
+    totalResponses: "Risposte totali",
+    praxisMeans: "Medie per dimensione PRAXIS (1-7)",
+    itemMeans: "Medie per item",
+    distributions: "Distribuzioni",
+    mean: "Media",
+    n: "N",
+    waiting: "In attesa di risposte...",
+    backHome: "Home",
+  },
+  en: {
+    appTitle: "PRAXIS Questionnaire",
+    subtitle: "AI in Education - follow-up",
+    chooseQuestionnaire: "Choose the questionnaire",
+    students: "Students",
+    teachers: "Teachers",
+    dashboard: "Live dashboard",
+    start: "Start",
+    next: "Next",
+    prev: "Back",
+    submit: "Submit",
+    submitted: "Thank you! Response recorded.",
+    required: "Required field",
+    yes: "Yes",
+    no: "No",
+    of: "of",
+    question: "Question",
+    totalResponses: "Total responses",
+    praxisMeans: "Means by PRAXIS dimension (1-7)",
+    itemMeans: "Item means",
+    distributions: "Distributions",
+    mean: "Mean",
+    n: "N",
+    waiting: "Waiting for responses...",
+    backHome: "Home",
+  },
+} as const;
+
+export type UIKey = keyof typeof UI.it;
+
+export function t(lang: Lang, key: UIKey): string {
+  return UI[lang][key];
+}
