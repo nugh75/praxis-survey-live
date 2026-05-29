@@ -2,10 +2,11 @@
 import asyncio
 import os
 
-from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from . import auth
 from .analysis import compute_stats
 from .database import SessionLocal, get_session, init_db
 from .models import Answer, Response
@@ -58,6 +59,12 @@ async def _startup():
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/api/auth/me")
+async def read_me(request: Request):
+    """Identita' dell'utente corrente verificata tramite ai4auth."""
+    return await auth.get_identity(request)
 
 
 @app.get("/api/questionnaires")
@@ -119,7 +126,7 @@ async def _push_stats(qid: str):
     await hub.broadcast(qid, stats)
 
 
-@app.get("/api/stats/{qid}")
+@app.get("/api/stats/{qid}", dependencies=[Depends(auth.get_current_active_admin)])
 async def stats(qid: str, session: AsyncSession = Depends(get_session)):
     if not get_questionnaire(qid):
         raise HTTPException(404, "questionnaire not found")
@@ -128,6 +135,12 @@ async def stats(qid: str, session: AsyncSession = Depends(get_session)):
 
 @app.websocket("/ws/stats/{qid}")
 async def ws_stats(ws: WebSocket, qid: str):
+    # auth_request non copre l'upgrade WebSocket: risolviamo l'identita' qui
+    # (segreto proxy o verifica cookie presso ai4auth).
+    identity = await auth.resolve_identity(ws.headers)
+    if not identity["is_admin"]:
+        await ws.close(code=1008)  # policy violation
+        return
     await hub.connect(ws, qid)
     try:
         # snapshot iniziale

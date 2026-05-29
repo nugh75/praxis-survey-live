@@ -20,6 +20,12 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-praxis}:${POSTGRES_PASSWORD:-praxis}@db:5432/${POSTGRES_DB:-praxis_survey}
       CORS_ORIGINS: http://localhost,http://localhost:5173,http://localhost:8002
+      # Auth admin (ai4auth). Stesso segreto del vhost nginx.
+      ADMIN_GROUP: ${ADMIN_GROUP:-admins}
+      FORWARD_AUTH_SHARED_SECRET: ${FORWARD_AUTH_SHARED_SECRET:-}
+      AI4AUTH_VERIFY_URL: ${AI4AUTH_VERIFY_URL:-https://auth.ai4educ.org/api/verify}
+      # Dev senza proxy: ADMIN_AUTH_DISABLED=1 tratta tutti come admin.
+      ADMIN_AUTH_DISABLED: ${ADMIN_AUTH_DISABLED:-0}
     depends_on:
       db:
         condition: service_healthy

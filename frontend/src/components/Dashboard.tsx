@@ -45,7 +45,7 @@ export default function Dashboard({ lang }: { lang: Lang }) {
     <div className="dashboard">
       <div className="dash-head">
         <h1>{stats.title[lang]} - {t(lang, "dashboard")}</h1>
-        <Link className="btn" to="/">{t(lang, "backHome")}</Link>
+        <Link className="btn" to="/admin">{t(lang, "backAdmin")}</Link>
       </div>
 
       <div className="kpi">
