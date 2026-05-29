@@ -19,7 +19,7 @@ export default function Survey({ lang }: { lang: Lang }) {
   }, [qid]);
 
   if (error) return <p className="error">{error}</p>;
-  if (!q) return <p>...</p>;
+  if (!q) return <p className="loading">{t(lang, "waiting")}</p>;
 
   if (done)
     return (
@@ -37,6 +37,11 @@ export default function Survey({ lang }: { lang: Lang }) {
   const missing = q.questions.filter(
     (item) => item.required && (answers[item.key] === undefined || answers[item.key] === null || answers[item.key] === "")
   );
+  const answered = q.questions.filter((item) => {
+    const value = answers[item.key];
+    return value !== undefined && value !== null && value !== "";
+  }).length;
+  const progress = Math.round((answered / q.questions.length) * 100);
 
   async function handleSubmit() {
     if (!q) return;
@@ -56,12 +61,23 @@ export default function Survey({ lang }: { lang: Lang }) {
 
   return (
     <div className="survey">
-      <h1>{q.title[lang]}</h1>
+      <div className="survey-head">
+        <div>
+          <span className="eyebrow">PRAXIS</span>
+          <h1>{q.title[lang]}</h1>
+        </div>
+        <div className="survey-progress" aria-label={`${progress}%`}>
+          <span>{answered}/{q.questions.length}</span>
+          <div className="progress-track">
+            <div style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+      </div>
       <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {q.questions.map((item, i) => (
           <div id={`q-${item.key}`} className="q-block" key={item.key}>
             <div className="q-index">
-              {t(lang, "question")} {i + 1} {t(lang, "of")} {q.questions.length}
+              <span>{t(lang, "question")} {i + 1} {t(lang, "of")} {q.questions.length}</span>
               <span className="dim-tag">{item.dimension}</span>
             </div>
             <QuestionField
